@@ -1,0 +1,15 @@
+credentials:
+  usernames:
+    user1:
+      email: "user1@example.com"
+      name: "John Doe"
+      password: "hashed_password_here"  # Replace with hashed password or plain text for testing
+    user2:
+      email: "user2@example.com"
+      name: "Jane Doe"
+      password: "hashed_password_here"  # Replace with hashed password or plain text for testing
+
+cookie:
+  name: "smart_edubot_cookie"
+  key: "cookie_secret_key"
+  expiry_days: 7

@@ -1,0 +1,14 @@
+streamlit
+streamlit-authenticator
+PyYAML
+pdfplumber
+speechrecognition
+transformers
+pymupdf
+bcrypt g
+streamlit-lottie
+requests
+python-dotenv
+streamlit-js-eval
+PyPDF2
+streamlit-extras
