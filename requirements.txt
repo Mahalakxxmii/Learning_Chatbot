@@ -5,7 +5,7 @@ pdfplumber
 speechrecognition
 transformers
 pymupdf
-bcrypt g
+bcrypt 
 streamlit-lottie
 requests
 python-dotenv
