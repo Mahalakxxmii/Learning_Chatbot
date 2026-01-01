@@ -181,10 +181,14 @@ OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 if send_clicked and st.session_state.current_input:
     user_message = st.session_state.current_input
-    st.session_state.chat_history.append({"role": "user", "content": user_message})
+
+    # 1️⃣ Add user message
+    st.session_state.chat_history.append(
+        {"role": "user", "content": user_message}
+    )
 
     headers = {
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",  # Replace with your key
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
         "Content-Type": "application/json",
         "HTTP-Referer": "https://streamlit.app",
         "X-Title": "EduyyBot"
@@ -196,23 +200,33 @@ if send_clicked and st.session_state.current_input:
     }
 
     try:
-        response = requests.post("https://openrouter.ai/api/v1/chat/completions",
-                                 headers=headers,
-                                 data=json.dumps(payload))
+        response = requests.post(
+            "https://openrouter.ai/api/v1/chat/completions",
+            headers=headers,
+            json=payload,      # ✅ IMPORTANT FIX
+            timeout=60
+        )
         response.raise_for_status()
-        reply = response.json()["choices"][0]["message"]["content"]
-        # Remove instruction tokens or extra trailing tags
-        reply = reply.replace("[/INST]", "").strip()
+
+        data = response.json()
+        reply = data["choices"][0]["message"]["content"].strip()
+
     except Exception as e:
         reply = f"❌ Error: {e}"
 
-    st.session_state.chat_history.append({"role": "assistant", "content": reply})
-    # ───── SAVE PERMANENT HISTORY ─────
-   # save_chat_history(username, st.session_state.chat_history)
+    # 2️⃣ Add assistant reply
+    st.session_state.chat_history.append(
+        {"role": "assistant", "content": reply}
+    )
+
+    # 3️⃣ Save history
     save_history(username, st.session_state.chat_history)
-    # Clear input
+
+    # 4️⃣ Clear input
     st.session_state.clear_flag = True
-    #st.rerun()
+
+    # 5️⃣ FORCE UI REFRESH ✅
+    st.rerun()
 
 upload_col, _ = st.columns([0.5,0.5])  # 30% width for uploader
 with upload_col:
