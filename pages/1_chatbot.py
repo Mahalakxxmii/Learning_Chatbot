@@ -10,27 +10,28 @@ from streamlit_extras.switch_page_button import switch_page
 st.markdown("""
 <style>
 .block-container {
-    max-width: 720px;
+    max-width: 760px;
     margin: auto;
 }
 
 .chat {
-    padding: 10px 14px;
+    padding: 12px 16px;
     border-radius: 14px;
     margin-bottom: 10px;
     max-width: 75%;
     font-size: 15px;
+    line-height: 1.5;
 }
 
 .user {
-    background-color: #1f6feb;
+    background-color: #2563eb;
     color: white;
     margin-left: auto;
 }
 
 .bot {
-    background-color: #21262d;
-    color: #e6edf3;
+    background-color: #1f2937;
+    color: #e5e7eb;
     margin-right: auto;
 }
 </style>
@@ -87,58 +88,6 @@ if not st.session_state["is_logged_in"]:
 # ───── LOAD PERMANENT HISTORY INTO SESSION ─────
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = load_history(username)
-
-# ───── STYLES ─────
-st.markdown("""
-<style>
-body {
-    background-color: #f5f7fa;
-}
-.chat-window {
-    max-height: 70vh;
-    overflow-y: auto;
-    padding: 2rem;
-    background-color: #ffffff;
-    border-radius: 12px;
-    margin: 2rem auto;
-    width: 65%;
-    max-width: 300px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.05);
-}
-.bubble {
-    padding: 12px 16px;
-    margin-bottom: 12px;
-    border-radius: 16px;
-    max-width: 90%;
-    font-size: 1rem;
-    line-height: 1.5;
-}
-.user-msg {
-    background-color: #dceeff;
-    margin-left: auto;
-    text-align: right;
-}
-.bot-msg {
-    background-color: #e8fce8;
-    margin-right: auto;
-    text-align: left;
-}
-.input-container {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 1rem;
-    background: white;
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-}
-
-</style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-""", unsafe_allow_html=True)
 
 # ───── CHAT DISPLAY ─────
 st.markdown("<div class='chat-window'>", unsafe_allow_html=True)
