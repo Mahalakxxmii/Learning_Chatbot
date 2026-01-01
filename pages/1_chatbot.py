@@ -7,6 +7,8 @@ import fitz
 import os 
 from streamlit_extras.switch_page_button import switch_page
 
+st.write("OPENROUTER KEY LOADED:", OPENROUTER_API_KEY is not None)
+
 # Function to load history from JSON
 def load_history(username):
     filename = f"history_{username}.json"
@@ -177,16 +179,16 @@ button[kind="secondary"]:hover {
 """, unsafe_allow_html=True)
 
 # ───── NLP CALL ─────
-OPENROUTER_KEY = os.getenv("OPENROUTER_KEY")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 if send_clicked and st.session_state.current_input:
     user_message = st.session_state.current_input
     st.session_state.chat_history.append({"role": "user", "content": user_message})
 
     headers = {
-        "Authorization": f"Bearer {OPENROUTER_KEY}",  # Replace with your key
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",  # Replace with your key
         "Content-Type": "application/json",
-        "HTTP-Referer": "http://localhost:8501",
+        "HTTP-Referer": "https://streamlit.app",
         "X-Title": "EduyyBot"
     }
 
@@ -241,12 +243,11 @@ with upload_col:
                 if prompt:
                     st.session_state.chat_history.append({"role": "user", "content": f"PDF Task: {action}"})
                     headers = {
-                    "Authorization": "Bearer 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",
-                    "Content-Type": "application/json",
-                    "HTTP-Referer": "http://localhost:8501",
-                    "X-Title": "EduyyBot"
-                    
-                }
+    "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+    "Content-Type": "application/json",
+    "HTTP-Referer": "https://streamlit.app",
+    "X-Title": "EduyyBot"
+}
                     payload = {
                     "model": "mistralai/mistral-7b-instruct:free",
                     "messages": st.session_state.chat_history + [{"role":"user","content":prompt}]
