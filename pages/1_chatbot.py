@@ -36,6 +36,42 @@ st.markdown("""
 }
 </style>
 """, unsafe_allow_html=True)
+st.markdown("""
+<style>
+.chat-window {
+    max-height: 65vh;
+    overflow-y: auto;
+    padding: 1rem;
+}
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<style>
+/* Chat buttons */
+.chat-btn {
+    background-color: #1f2937 !important;
+    color: #e5e7eb !important;
+    border: 1px solid #374151 !important;
+    border-radius: 10px !important;
+    padding: 6px 10px !important;
+    font-size: 16px !important;
+    cursor: pointer;
+}
+
+.chat-btn:hover {
+    background-color: #374151 !important;
+}
+
+/* Input box */
+input[type="text"] {
+    background-color: #111827 !important;
+    color: #e5e7eb !important;
+    border-radius: 10px !important;
+    border: 1px solid #374151 !important;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # Function to load history from JSON
 def load_history(username):
@@ -67,7 +103,7 @@ if "clear_flag" in st.session_state and st.session_state.clear_flag:
     st.session_state.clear_flag = False
 
 # EDUBOT centered below
-st.markdown("<h4 style='text-align:center; color:#555;'>EDUBOT</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align:center; color:#9ca3af;'>EDUBOT</h4>", unsafe_allow_html=True)
 
 # ───── AUTH CHECK ─────
 if "is_logged_in" not in st.session_state:
@@ -133,25 +169,30 @@ with input_col:
     )
 
 with send_col:
-    send_clicked = st.button("➤", help="Send")  # small rectangular button
+    send_clicked = st.button("➤", key="send", help="Send", type="secondary")
 
 with clear_col:
-    if st.button("🗑️", help="Clear Chat History"):
+    if st.button("🗑️", key="clear", help="Clear Chat History", type="secondary"):
         clear_history(username)
         st.session_state.chat_history = []
-        st.stop()
+        st.rerun()
+
         #st.experimental_rerun()
 # Optional: Add CSS to make buttons small & rectangular
 st.markdown("""
 <style>
+/* Send, Clear, PDF buttons - DARK MODE */
 button[kind="secondary"] {
-    padding: 0.25rem 0.5rem !important;
-    font-size: 1.2rem !important;
-    border-radius: 6px !important;
-    background-color: white !important;
+    background-color: #1f2937 !important;
+    color: #e5e7eb !important;
+    border: 1px solid #374151 !important;
+    border-radius: 10px !important;
+    padding: 6px 10px !important;
+    font-size: 1.1rem !important;
 }
+
 button[kind="secondary"]:hover {
-    background-color: white !important;
+    background-color: #374151 !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -210,6 +251,21 @@ if send_clicked and st.session_state.current_input:
 
 upload_col, _ = st.columns([0.5,0.5])  # 30% width for uploader
 with upload_col:
+    st.markdown("""
+<style>
+[data-testid="stFileUploader"] {
+    background-color: #111827 !important;
+    border: 1px dashed #374151 !important;
+    border-radius: 12px !important;
+    padding: 12px !important;
+}
+
+[data-testid="stFileUploader"] label {
+    color: #e5e7eb !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
     uploaded_file = st.file_uploader("To Upload PDF", type=["pdf"])
     if uploaded_file:
         try:
