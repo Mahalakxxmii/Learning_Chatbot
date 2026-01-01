@@ -9,52 +9,29 @@ from streamlit_extras.switch_page_button import switch_page
 
 st.markdown("""
 <style>
-/* ===== LIGHT MODE ===== */
-:root {
-  --bg-color: #EFEEEA;
-  --chat-bg: #FFFFFF;
-  --user-msg: #DCF8C6;
-  --bot-msg: #F1F0F0;
-  --text-color: #262730;
-  --input-bg: #FFFFFF;
+.block-container {
+    max-width: 720px;
+    margin: auto;
 }
 
-/* ===== DARK MODE ===== */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-color: #0E1117;
-    --chat-bg: #1C1E26;
-    --user-msg: #1F7A5C;
-    --bot-msg: #2A2D3A;
-    --text-color: #FAFAFA;
-    --input-bg: #262730;
-  }
+.chat {
+    padding: 10px 14px;
+    border-radius: 14px;
+    margin-bottom: 10px;
+    max-width: 75%;
+    font-size: 15px;
 }
 
-/* ===== APPLY ===== */
-body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
+.user {
+    background-color: #1f6feb;
+    color: white;
+    margin-left: auto;
 }
 
-.bubble {
-  padding: 12px 16px;
-  border-radius: 16px;
-  max-width: 80%;
-  margin-bottom: 12px;
-  line-height: 1.5;
-}
-
-.user-msg {
-  background-color: var(--user-msg);
-  color: var(--text-color);
-  margin-left: auto;
-}
-
-.bot-msg {
-  background-color: var(--bot-msg);
-  color: var(--text-color);
-  margin-right: auto;
+.bot {
+    background-color: #21262d;
+    color: #e6edf3;
+    margin-right: auto;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -121,7 +98,7 @@ body {
     max-height: 70vh;
     overflow-y: auto;
     padding: 2rem;
-
+    background-color: #ffffff;
     border-radius: 12px;
     margin: 2rem auto;
     width: 65%;
@@ -166,14 +143,16 @@ body {
 # ───── CHAT DISPLAY ─────
 st.markdown("<div class='chat-window'>", unsafe_allow_html=True)
 # Display chat history
-for msg in st.session_state.chat_history:
-    role = msg["role"]
-    content = msg["content"]
-    bubble_class = "user-msg" if role == "user" else "bot-msg"
+for chat in st.session_state.chat_history:
+    role = chat["role"]
+    msg = chat["content"]
+
+    cls = "user" if role == "user" else "bot"
+
     st.markdown(
-        f"<div class='bubble {bubble_class}'><strong>{role.capitalize()}:</strong><br>{content}</div>",
-        unsafe_allow_html=True,
-    )
+    f"<div class='chat {cls}'>{msg}</div>",
+    unsafe_allow_html=True
+)
 
 # ───── AUTO-SCROLL TO BOTTOM ─────
 st.markdown("""
