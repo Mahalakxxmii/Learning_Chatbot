@@ -7,6 +7,58 @@ import fitz
 import os 
 from streamlit_extras.switch_page_button import switch_page
 
+st.markdown("""
+<style>
+/* ===== LIGHT MODE ===== */
+:root {
+  --bg-color: #EFEEEA;
+  --chat-bg: #FFFFFF;
+  --user-msg: #DCF8C6;
+  --bot-msg: #F1F0F0;
+  --text-color: #262730;
+  --input-bg: #FFFFFF;
+}
+
+/* ===== DARK MODE ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #0E1117;
+    --chat-bg: #1C1E26;
+    --user-msg: #1F7A5C;
+    --bot-msg: #2A2D3A;
+    --text-color: #FAFAFA;
+    --input-bg: #262730;
+  }
+}
+
+/* ===== APPLY ===== */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.bubble {
+  padding: 12px 16px;
+  border-radius: 16px;
+  max-width: 80%;
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.user-msg {
+  background-color: var(--user-msg);
+  color: var(--text-color);
+  margin-left: auto;
+}
+
+.bot-msg {
+  background-color: var(--bot-msg);
+  color: var(--text-color);
+  margin-right: auto;
+}
+</style>
+""", unsafe_allow_html=True)
+
 # Function to load history from JSON
 def load_history(username):
     filename = f"history_{username}.json"
@@ -69,7 +121,7 @@ body {
     max-height: 70vh;
     overflow-y: auto;
     padding: 2rem;
-    background-color: #ffffff;
+
     border-radius: 12px;
     margin: 2rem auto;
     width: 65%;
