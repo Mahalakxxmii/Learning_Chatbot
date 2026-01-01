@@ -178,7 +178,6 @@ button[kind="secondary"]:hover {
 
 # ───── NLP CALL ─────
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-st.write("OPENROUTER KEY LOADED:", OPENROUTER_API_KEY is not None)
 
 if send_clicked and st.session_state.current_input:
     user_message = st.session_state.current_input
