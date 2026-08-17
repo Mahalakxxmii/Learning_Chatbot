@@ -47,17 +47,9 @@ if "page" not in st.session_state:
 # If already logged in, redirect immediately to chatbot
 if st.session_state["is_logged_in"]:
     st.session_state["page"] = "chatbot"
-    st.switch_page("pages/1_chatbot.py")  
-# 🧼 Hide sidebar and footer
-st.markdown("""
-    <style>
-        [data-testid="stSidebar"] { display: none !important; }
-        [data-testid="stSidebarNav"] { display: none !important; }
-        footer, header {visibility: hidden;}
-    </style>
-""", unsafe_allow_html=True)
+    st.switch_page("pages/1_chatbot.py")
 
-# Load users from JSO
+# Load users from JSON
 SMTP_SERVER   = os.getenv("SMTP_SERVER")     # e.g. "smtp.gmail.com"
 SMTP_PORT     = int(os.getenv("SMTP_PORT", 587))
 SMTP_USER     = os.getenv("SMTP_USER")       # your email
@@ -108,216 +100,220 @@ def add_new_user(email, username, password):
     })
     save_users(users)
 
-def main():
+
+# ───── AUTO LOGIN VIA COOKIE (persists across browser refresh) ─────
+if not st.session_state["is_logged_in"]:
+    cookie_user = get_cookie(COOKIE_KEY)
+    if cookie_user:
+        users = load_users()
+        if any(u["username"] == cookie_user for u in users["users"]):
+            st.session_state["is_logged_in"] = True
+            st.session_state["logged_once"] = True
+            st.session_state["username"] = cookie_user
+            st.session_state["page"] = "chatbot"
+            st.switch_page("pages/1_chatbot.py")
+
+
+def inject_css():
     st.markdown("""
         <style>
-          .block-container {
-            padding-top: 0rem !important;
-            padding-bottom: 0rem !important;
-            margin-top: 0rem !important;
-            margin-bottom: 0rem !important;
-            height: 100vh !important;
+        /* ---------- ChatGPT-style dark theme for the auth page ---------- */
+        html, body, [class*="css"] {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+        .stApp { background-color: #212121 !important; }
+
+        [data-testid="stSidebar"] { display: none !important; }
+        [data-testid="stSidebarNav"] { display: none !important; }
+        footer, header {visibility: hidden;}
+
+        .block-container {
+            max-width: 400px !important;
+            padding-top: 10vh !important;
+            margin: 0 auto !important;
         }
 
-        /* Prevent scrollbars */
-        html, body, [class*="stApp"] {
-            height: 100vh !important;
-            overflow: hidden !important;
-        }
-
-        /* Center content vertically */
-        .main {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh !important;
-            padding: 0 !important;
-        }
-        .stApp {
-           /* background-image: url("https://i.pinimg.com/1200x/a2/88/37/a28837488ede20bcfc1c931267e9c617.jpg) */
-            background-color:#EFEEEA
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
-        /* Input field styles */
-        .stTextInput input, .stPasswordInput input {
-            width: 400px !important;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #ccc;
-            display: block;
-            margin: 0 auto;
-        }
-        .stTextInput, .stPasswordInput {
-            width: 300px !important;
-            margin: 10px auto;
-            padding: 0px;
-        }
-        label[data-testid="stMarkdownContainer"] > div {
+        .auth-title {
             text-align: center;
+            color: #ececec;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 2px;
         }
-        div[data-baseweb="select"] {
-            width: 300px !important;
-            margin: 0 auto 0px auto;
+        .auth-subtitle {
+            text-align: center;
+            color: #9b9b9b;
+            font-size: 14px;
+            margin-bottom: 26px;
         }
+
+        /* Inputs */
+        .stTextInput input {
+            background-color: #2f2f2f !important;
+            color: #ececec !important;
+            border: 1px solid #4b4b4b !important;
+            border-radius: 10px !important;
+            padding: 10px 12px !important;
+        }
+        .stTextInput input::placeholder { color: #7a7a7a !important; }
+        .stTextInput input:focus {
+            border: 1px solid #10a37f !important;
+            box-shadow: none !important;
+        }
+        .stTextInput label {
+            color: #d4d4d4 !important;
+            font-size: 13px !important;
+        }
+
+        /* Select box (Log In / Sign Up switch) */
+        div[data-baseweb="select"] > div {
+            background-color: #2f2f2f !important;
+            border: 1px solid #4b4b4b !important;
+            border-radius: 10px !important;
+            color: #ececec !important;
+        }
+        div[data-baseweb="select"] * { color: #ececec !important; }
+
+        /* Primary buttons */
         div.stButton > button {
-    display: block!important;    /* ensures block-level for centering */
-    margin: 0 auto !important;    /* horizontally center */
-    width: 200px !important;         /* same width for all buttons */
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    padding: 10px;
-    
-}
-        h1 {
-            text-align: center;
+            width: 100% !important;
+            background-color: #10a37f !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 10px !important;
+            padding: 10px !important;
+            font-weight: 500 !important;
+            margin-top: 4px;
+            transition: background-color 0.15s ease-in-out;
         }
-        h3 {
-             text-align: center !important;   /* Left align headers/subheaders */
-                position: relative;
-            left: -100px;
-    margin-left: 0px; 
-            font-size: 20px !important; /* Subheader smaller */
-            font-weight: normal;
+        div.stButton > button:hover {
+            background-color: #0d8a6b !important;
+            color: white !important;
         }
+
+        .link-row { text-align: center; color: #7a7a7a; font-size: 13px; margin: 10px 0 2px 0; }
+
+        div[data-testid="stAlert"] { border-radius: 10px !important; }
+        hr.auth-divider { border: none; border-top: 1px solid #3a3a3a; margin: 22px 0; }
         </style>
     """, unsafe_allow_html=True)
-    
-    with st.container():
-        st.title("EduBot")
 
 
-        st.subheader("Are you a new user?")
-        # ✅ Use label_visibility to avoid warning
-        option = st.selectbox("Choose an option", ["Sign Up", "Log In"], label_visibility="collapsed")
-        
+def main():
+    inject_css()
+
+    st.markdown("<div class='auth-title'>EduBot</div>", unsafe_allow_html=True)
+    st.markdown("<div class='auth-subtitle'>Your AI study companion</div>", unsafe_allow_html=True)
+
+    option = st.selectbox("Choose an option", ["Log In", "Sign Up"], label_visibility="collapsed")
 
     users_data = load_users()
 
     if option == "Sign Up":
-        st.subheader("Create an account")
-
         email = st.text_input("Email", placeholder="Enter your email")
         username = st.text_input("Username", placeholder="Choose a username")
         password = st.text_input("Password", type="password", placeholder="Create a password")
 
-        col1, col2, col3 = st.columns([1,2,1])
-        with col2:
-            if st.button("Sign Up"):
-                if not (email and username and password):
-                    st.error("Please fill in all fields")
+        if st.button("Sign Up"):
+            if not (email and username and password):
+                st.error("Please fill in all fields")
+            else:
+                users = load_users()
+
+                email_taken = any(u["email"] == email for u in users["users"])
+                user_taken = any(u["username"] == username for u in users["users"])
+
+                if email_taken or user_taken:
+                    dup_msg = []
+                    if email_taken: dup_msg.append("e-mail")
+                    if user_taken: dup_msg.append("username")
+                    joined = " and ".join(dup_msg)
+                    st.warning(f"That {joined} is already registered. Please log in instead")
                 else:
-                    users = load_users()
-
-                    email_taken = any(u["email"] == email for u in users["users"])
-                    user_taken = any(u["username"] == username for u in users["users"])
-
-                    if email_taken or user_taken:
-                        dup_msg = []
-                        if email_taken: dup_msg.append("e-mail")
-                        if user_taken: dup_msg.append("username")
-                        joined  = " and ".join(dup_msg)
-                        st.warning(f"That {joined} is already registered .""Please log in instead")
-                    else:
-                        add_new_user(email, username, password)
-                        st.success("Account created successfully! You can now log in.")
+                    add_new_user(email, username, password)
+                    st.success("Account created successfully! You can now log in.")
 
     elif option == "Log In":
-        st.subheader("Log into your account")
-
-    # ── 1️⃣  STANDARD LOGIN  ──────────────────────────────
+        # ── 1️⃣  STANDARD LOGIN  ──────────────────────────────
         login_username = st.text_input("Username", key="login_username",
-                                   placeholder="Enter your username")
+                                        placeholder="Enter your username")
         login_password = st.text_input("Password", key="login_password",
-                                   placeholder="Enter your password", type="password")
+                                        placeholder="Enter your password", type="password")
 
-        col1, col2, col3 = st.columns([1, 2.3, 0.7])
-        with col2:
-            if st.button("Log In"):
-                if not (login_username and login_password):
-                    st.error("Please fill both fields.")
-                elif check_user_credentials(login_username, login_password):
-                    st.session_state["is_logged_in"] = True
-                    st.session_state["logged_once"] = True
-                    st.session_state.username = login_username
-                    st.success(f"Welcome {login_username}! , Redirecting to Bot…")
-                    st.session_state["page"] = "chatbot"
-                    st.rerun()
-                else:
-                    st.error("Invalid username or password.")
+        if st.button("Log In"):
+            if not (login_username and login_password):
+                st.error("Please fill both fields.")
+            elif check_user_credentials(login_username, login_password):
+                st.session_state["is_logged_in"] = True
+                st.session_state["logged_once"] = True
+                st.session_state.username = login_username
+                set_cookie(COOKIE_KEY, login_username)
+                st.success(f"Welcome {login_username}! Redirecting to Bot…")
+                st.session_state["page"] = "chatbot"
+                st.rerun()
+            else:
+                st.error("Invalid username or password.")
 
+        st.markdown("<div class='link-row'>or</div>", unsafe_allow_html=True)
 
-        st.markdown("<p style='text-align:center;'>or</p>", unsafe_allow_html=True)
+        # ── 2️⃣  FORGOT‑PASSWORD (OTP) FLOW  ──────────────────
+        if "fp_stage" not in st.session_state:  # track stage: 0 idle, 1 got e‑mail, 2 otp ok
+            st.session_state.fp_stage = 0  # 0: waiting
 
-    # ── 2️⃣  FORGOT‑PASSWORD (OTP) FLOW  ──────────────────
-        if "fp_stage" not in st.session_state:            # track stage: 0 idle, 1 got e‑mail, 2 otp ok
-            st.session_state.fp_stage = 0                 # 0: waiting
+        # ► Stage‑0: show link
+        if st.button("Forgot Password?"):
+            st.session_state.fp_stage = 1
 
-    # ► Stage‑0: show link
-        col1, col2, col3 = st.columns([1, 2.3, 0.7])
-        with col2:
-            if st.button("Forgot Password?"):
-                st.session_state.fp_stage = 1
-
-
-    # ► Stage‑1: ask for e‑mail and send OTP
+        # ► Stage‑1: ask for e‑mail and send OTP
         if st.session_state.fp_stage == 1:
             email_input = st.text_input("Enter your registered e‑mail")
-            col1, col2, col3 = st.columns([1, 2.3, 0.7])
-            with col2:
-                if st.button("Send OTP"):
-                    user = next((u for u in users_data["users"]
-                        if u["username"] == login_username and u["email"] == email_input), None)
-                    if not login_username:
-                        st.error("Enter your username above first.")
-                    elif not email_input:
-                        st.error("Enter your e‑mail.")
-                    elif not user:
-                        st.error("Username & e‑mail pair not found.")
-                    else:
-                        otp = f"{random.randint(100000, 999999)}"
-                        try:
-                            send_otp_email(email_input, otp)
-                            st.session_state.fp_otp        = otp
-                            st.session_state.fp_username   = login_username
-                            st.session_state.fp_timestamp  = time.time()
-                            st.session_state.fp_stage      = 2
-                            st.success("OTP sent! Check your inbox.")
-                        except Exception as e:
-                            st.error(f"E‑mail failed ➜ {e}")
+            if st.button("Send OTP"):
+                user = next((u for u in users_data["users"]
+                             if u["username"] == login_username and u["email"] == email_input), None)
+                if not login_username:
+                    st.error("Enter your username above first.")
+                elif not email_input:
+                    st.error("Enter your e‑mail.")
+                elif not user:
+                    st.error("Username & e‑mail pair not found.")
+                else:
+                    otp = f"{random.randint(100000, 999999)}"
+                    try:
+                        send_otp_email(email_input, otp)
+                        st.session_state.fp_otp = otp
+                        st.session_state.fp_username = login_username
+                        st.session_state.fp_timestamp = time.time()
+                        st.session_state.fp_stage = 2
+                        st.success("OTP sent! Check your inbox.")
+                    except Exception as e:
+                        st.error(f"E‑mail failed ➜ {e}")
 
-    # ► Stage‑2: verify OTP & set new password
+        # ► Stage‑2: verify OTP & set new password
         if st.session_state.fp_stage == 2:
             entered_otp = st.text_input("Enter the 6‑digit OTP")
-            new_pw1     = st.text_input("New password", type="password")
-            new_pw2     = st.text_input("Confirm password", type="password")
+            new_pw1 = st.text_input("New password", type="password")
+            new_pw2 = st.text_input("Confirm password", type="password")
 
-            col1, col2, col3 = st.columns([1, 2.3, 0.7])
-            with col2:
-                if st.button("Reset Password"):
-
-                    expired = time.time() - st.session_state.fp_timestamp > 300  # 5 min
-                    if expired:
-                        st.error("OTP expired — click *Forgot Password?* again.")
-                        st.session_state.fp_stage = 0
-                    elif entered_otp != st.session_state.fp_otp:
-                        st.error("Incorrect OTP.")
-                    elif new_pw1 != new_pw2 or not new_pw1:
-                        st.error("Passwords don’t match or are empty.")
-                    else:
-                # store new password
-                        for usr in users_data["users"]:
-                            if usr["username"] == st.session_state.fp_username:
-                                usr["password"] = bcrypt.hashpw(new_pw1.encode(),bcrypt.gensalt()).decode()
-                                save_users(users_data)
-                                break
-                        st.success("Password reset! Please log in with the new password.")
-                # clear fp session keys
-                        for k in ("fp_stage","fp_otp","fp_username","fp_timestamp"):
-                            st.session_state.pop(k, None)
-            
+            if st.button("Reset Password"):
+                expired = time.time() - st.session_state.fp_timestamp > 300  # 5 min
+                if expired:
+                    st.error("OTP expired — click *Forgot Password?* again.")
+                    st.session_state.fp_stage = 0
+                elif entered_otp != st.session_state.fp_otp:
+                    st.error("Incorrect OTP.")
+                elif new_pw1 != new_pw2 or not new_pw1:
+                    st.error("Passwords don’t match or are empty.")
+                else:
+                    # store new password
+                    for usr in users_data["users"]:
+                        if usr["username"] == st.session_state.fp_username:
+                            usr["password"] = bcrypt.hashpw(new_pw1.encode(), bcrypt.gensalt()).decode()
+                            save_users(users_data)
+                            break
+                    st.success("Password reset! Please log in with the new password.")
+                    # clear fp session keys
+                    for k in ("fp_stage", "fp_otp", "fp_username", "fp_timestamp"):
+                        st.session_state.pop(k, None)
 
 
 main()
