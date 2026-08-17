@@ -216,10 +216,9 @@ if send_clicked and st.session_state.current_input:
     }
 
     payload = {
-        "model": "mistralai/mistral-7b-instruct:free",
-        "messages": st.session_state.chat_history
-    }
-
+    "model": "openrouter/free",
+    "messages": st.session_state.chat_history
+}
     try:
         response = requests.post(
             "https://openrouter.ai/api/v1/chat/completions",
@@ -297,9 +296,11 @@ with upload_col:
     "X-Title": "EduyyBot"
 }
                     payload = {
-                    "model": "mistralai/mistral-7b-instruct:free",
-                    "messages": st.session_state.chat_history + [{"role":"user","content":prompt}]
-                }
+    "model": "openrouter/free",
+    "messages": st.session_state.chat_history + [
+        {"role": "user", "content": prompt}
+    ]
+}
                     try:
                         response = requests.post("https://openrouter.ai/api/v1/chat/completions",
                                              headers=headers, data=json.dumps(payload))
