@@ -3,9 +3,9 @@ import requests
 import json
 from PyPDF2 import PdfReader
 import pdfplumber
-import fitz
+#import fitz
 import os 
-from streamlit_extras.switch_page_button import switch_page
+#from streamlit_extras.switch_page_button import switch_page
 
 st.markdown("""
 <style>
